@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:3000
+
+### Get all labels
+GET {{baseUrl}}/labels
+
+###
+
+### Get one label
+GET {{baseUrl}}/labels/1
+
+###
+
+### Create a label
+POST {{baseUrl}}/labels
+Content-Type: application/json
+
+{
+  "name": "bug",
+  "color": "#e11d48"
+}
+
+###
+
+### Update a label
+PATCH {{baseUrl}}/labels/1
+Content-Type: application/json
+
+{
+  "name": "critical bug",
+  "color": "#9f1239"
+}
+
+###
+
+### Delete a label
+DELETE {{baseUrl}}/labels/1

@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:3000
+
+### Get all tickets
+GET {{baseUrl}}/tickets
+
+###
+
+### Get one ticket
+GET {{baseUrl}}/tickets/1
+
+###
+
+### Create a ticket
+POST {{baseUrl}}/tickets
+Content-Type: application/json
+
+{
+  "name": "Fix login bug",
+  "description": "Users cannot log in with Google OAuth",
+  "boardsId": 1
+}
+
+###
+
+### Create a ticket with explicit phase
+POST {{baseUrl}}/tickets
+Content-Type: application/json
+
+{
+  "name": "Add dark mode",
+  "description": "Implement dark mode toggle",
+  "ticketPhase": "IN_PROGRESS",
+  "boardsId": 1
+}
+
+###
+
+### Update a ticket
+PATCH {{baseUrl}}/tickets/1
+Content-Type: application/json
+
+{
+  "name": "Fix login bug (updated)",
+  "ticketPhase": "UNDER_REVIEW"
+}
+
+###
+
+### Delete a ticket
+DELETE {{baseUrl}}/tickets/1
+
+###
+
+### Assign a label to a ticket
+PATCH {{baseUrl}}/tickets/1/assign/1
+
+###
+
+### Remove a label from a ticket
+DELETE {{baseUrl}}/tickets/1/assign/1

@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:3000
+
+### Hello
+GET {{baseUrl}}/
+
+###
+
+### Get all boards
+GET {{baseUrl}}/boards
+
+###
+
+### Get one board
+GET {{baseUrl}}/boards/1
+
+###
+
+### Create a board
+POST {{baseUrl}}/boards
+Content-Type: application/json
+
+{
+  "title": "My first board"
+}
+
+###
+
+### Update a board
+PATCH {{baseUrl}}/boards/1
+Content-Type: application/json
+
+{
+  "title": "Updated board title"
+}
+
+###
+
+### Delete a board
+DELETE {{baseUrl}}/boards/1
