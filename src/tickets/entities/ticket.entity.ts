@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDate,
   IsEnum,
@@ -28,6 +29,7 @@ export class Ticket {
   description: string | null = null;
 
   @IsEnum(TicketPhase)
+  @ApiProperty({ enum: TicketPhase })
   ticketPhase: TicketPhase = TicketPhase.CREATED;
 
   @IsNumber()
