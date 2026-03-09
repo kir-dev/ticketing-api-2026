@@ -5,6 +5,7 @@ import { BoardsModule } from './boards/boards.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { LabelsModule } from './labels/labels.module';
 
 import configuration from './config/configuration';
 
@@ -19,6 +20,7 @@ import configuration from './config/configuration';
     }),
     BoardsModule,
     TicketsModule,
+    LabelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

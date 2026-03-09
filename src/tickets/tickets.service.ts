@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, Ticket } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { TicketWithLabels } from './entities/ticket-with-labels.entity';
 
 @Injectable()
 export class TicketsService {
@@ -33,15 +34,17 @@ export class TicketsService {
     return await this.prisma.ticket.findMany();
   }
 
-  async findOne(id: number): Promise<Ticket> {
+  async findOne(id: number): Promise<TicketWithLabels> {
     const ticket = await this.prisma.ticket.findUnique({
       where: { id },
+      include: {
+        labels: true,
+      },
     });
 
     if (!ticket) {
       throw new NotFoundException(`Ticket with id ${id} not found`);
     }
-
     return ticket;
   }
 
@@ -75,6 +78,65 @@ export class TicketsService {
       }
       console.error(e);
       throw new BadRequestException(`Could not delete ticket with id ${id}`);
+    }
+  }
+
+  async assignLabel(
+    ticketId: number,
+    labelId: number,
+  ): Promise<TicketWithLabels> {
+    try {
+      return await this.prisma.ticket.update({
+        where: { id: ticketId },
+        data: {
+          labels: {
+            // A 'connect' kulcsszó köti össze a két meglévő rekordot
+            connect: { id: labelId },
+          },
+        },
+        include: {
+          labels: true,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException('Invalid label id');
+        }
+        if (e.code === 'P2016') {
+          throw new NotFoundException('Invalid ticket id');
+        }
+      }
+      throw new BadRequestException(`Could not assign label to ticket`);
+    }
+  }
+
+  async removeLabel(
+    ticketId: number,
+    labelId: number,
+  ): Promise<TicketWithLabels> {
+    try {
+      return await this.prisma.ticket.update({
+        where: { id: ticketId },
+        data: {
+          labels: {
+            // A 'disconnect' megszünteti a kapcsolatot a két rekord között
+            disconnect: { id: labelId },
+          },
+        },
+        include: {
+          labels: true,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException('Invalid label id');
+        }
+      }
+      throw new BadRequestException(`Could not remove label from ticket`);
     }
   }
 }

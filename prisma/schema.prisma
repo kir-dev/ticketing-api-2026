@@ -28,12 +28,20 @@ model Ticket {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  board    Boards @relation(fields: [boardsId], references: [id])
+  board    Boards  @relation(fields: [boardsId], references: [id])
   boardsId Int
+  labels   Label[]
 }
 
 enum TicketPhase {
   CREATED
   IN_PROGRESS
   UNDER_REVIEW
+}
+
+model Label {
+  id      Int      @id @default(autoincrement())
+  name    String
+  color   String
+  tickets Ticket[]
 }

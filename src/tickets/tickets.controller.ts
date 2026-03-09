@@ -19,6 +19,7 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from './entities/ticket.entity';
 import { TicketsService } from './tickets.service';
+import { TicketWithLabels } from './entities/ticket-with-labels.entity';
 
 @Controller('tickets')
 export class TicketsController {
@@ -47,9 +48,9 @@ export class TicketsController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: Ticket })
+  @ApiOkResponse({ type: TicketWithLabels })
   @ApiNotFoundResponse({ description: 'Ticket with given id not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Ticket> {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<TicketWithLabels> {
     return this.ticketsService.findOne(id);
   }
 
@@ -71,5 +72,34 @@ export class TicketsController {
   @ApiBadRequestResponse({ description: 'Could not delete ticket' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<Ticket> {
     return this.ticketsService.remove(id);
+  }
+
+  @Patch(':ticketId/assign/:labelId')
+  @ApiOkResponse({ type: TicketWithLabels })
+  @ApiNotFoundResponse({
+    description:
+      'Ticket or label with given id not found. You can deduce which one from the error message',
+  })
+  @ApiBadRequestResponse({ description: 'Could not assign label' })
+  assignLabel(
+    @Param('ticketId', ParseIntPipe) ticketId: number,
+    @Param('labelId', ParseIntPipe) labelId: number,
+  ): Promise<TicketWithLabels> {
+    return this.ticketsService.assignLabel(ticketId, labelId);
+  }
+
+  @Delete(':ticketId/assign/:labelId')
+  @ApiOkResponse({
+    description:
+      "The label was successfully removed from the ticket. Worth to note, that this returns 200 even if the label wasn't connected to the ticket.",
+    type: TicketWithLabels,
+  })
+  @ApiNotFoundResponse({ description: 'Ticket with given id not found' })
+  @ApiBadRequestResponse({ description: 'Could not remove label' })
+  removeLabel(
+    @Param('ticketId', ParseIntPipe) ticketId: number,
+    @Param('labelId', ParseIntPipe) labelId: number,
+  ): Promise<TicketWithLabels> {
+    return this.ticketsService.removeLabel(ticketId, labelId);
   }
 }
