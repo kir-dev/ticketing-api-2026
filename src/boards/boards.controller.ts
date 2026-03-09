@@ -1,44 +1,48 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
 } from '@nestjs/common';
+import { CreateBoardDto } from './dto/create-board.dto';
+import { UpdateBoardDto } from './dto/update-board.dto';
+import { Board } from './entities/board.entity';
+import { BoardWithTickets } from './entities/board-with-tickets.entity';
 import { BoardsService } from './boards.service';
-import { Prisma } from '../generated/prisma/client';
 
 @Controller('boards')
 export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
 
   @Post()
-  create(@Body() createBoardDto: Prisma.BoardsCreateInput) {
+  create(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
     return this.boardsService.create(createBoardDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Board[]> {
     return this.boardsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<BoardWithTickets> {
+    return this.boardsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() updateBoardDto: Prisma.BoardsUpdateInput,
-  ) {
-    return this.boardsService.update(+id, updateBoardDto);
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBoardDto: UpdateBoardDto,
+  ): Promise<Board> {
+    return this.boardsService.update(id, updateBoardDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.boardsService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<Board> {
+    return this.boardsService.remove(id);
   }
 }

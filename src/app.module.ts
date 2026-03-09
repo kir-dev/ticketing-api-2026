@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { BoardsModule } from './boards/boards.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 import configuration from './config/configuration';
 
@@ -17,6 +18,7 @@ import configuration from './config/configuration';
       isGlobal: true,
     }),
     BoardsModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
