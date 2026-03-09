@@ -1,26 +1,76 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { UpdateBoardDto } from './dto/update-board.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Boards, Ticket, Prisma } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class BoardsService {
-  create(createBoardDto: CreateBoardDto) {
-    return 'This action adds a new board';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createBoardDto: Prisma.BoardsCreateInput) {
+    try {
+      return await this.prisma.boards.create({
+        data: createBoardDto,
+      });
+    } catch (e) {
+      console.error(e);
+      throw new BadRequestException('Could not create board');
+    }
   }
 
-  findAll() {
-    return `This action returns all boards`;
+  async findAll(): Promise<Boards[]> {
+    return await this.prisma.boards.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} board`;
+  async findOne(id: number): Promise<Boards & { tickets: Ticket[] }> {
+    const board = await this.prisma.boards.findUnique({
+      where: { id },
+      include: { tickets: true },
+    });
+
+    if (!board) {
+      throw new NotFoundException(`Board with id ${id} not found`);
+    }
+
+    return board;
   }
 
-  update(id: number, updateBoardDto: UpdateBoardDto) {
-    return `This action updates a #${id} board`;
+  async update(
+    id: number,
+    updateBoardDto: Prisma.BoardsUpdateInput,
+  ): Promise<Boards> {
+    try {
+      return await this.prisma.boards.update({
+        where: { id },
+        data: updateBoardDto,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Board with id ${id} not found`);
+        }
+      }
+      console.error(e);
+      throw new BadRequestException(`Could not update board with id ${id}`);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} board`;
+  async remove(id: number): Promise<Boards> {
+    try {
+      return await this.prisma.boards.delete({
+        where: { id },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2025') {
+          throw new NotFoundException(`Board with id ${id} not found`);
+        }
+      }
+      console.error(e);
+      throw new BadRequestException(`Could not delete board with id ${id}`);
+    }
   }
 }
